@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test</title>
+</head>
+<body>
+<div class="tips">
+    <p>
+        <strong>按0开始识别，请确保电脑混音已打开,并且设为默认设备</strong>
+        <br>麦克风只能识别人声，不能识别扬声器发出的声音即为未开启。可以先到<a href='https://translate.google.cn/'>谷歌翻译</a>找一个长句子读
+        ，试验功能正确性<br>
+        基于chrome的Web Speech API，在页面需要语音输入功能时可以去使用一下。资料较少，暂时没有找到断句等其他功能，待发现
+    </p>
+    <p id="info"></p>
+</div>
+<div class="temp">
+    临时文本：
+    <hr>
+    <p id="temp"></p>
+</div>
+<div class="container">
+    最终文本：
+    <hr>
+    <p id="main">
+    </p>
+</div>
+</body>
+<script>
+    let recognition = new window.webkitSpeechRecognition;
+    let final_transcript = '';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let temp = document.getElementById("temp");
+    let main = document.getElementById("main");
+    let info = document.getElementById("info");
+    recognition.onstart = function () {
+        info.innerText = "开始识别。。。";
+        console.log('======================' + 'start' + '======================');
+    };
+    recognition.onresult = function (event) {
+        let interim_transcript = '';
+
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                final_transcript += event.results[i][0].transcript;
+                main.innerText = final_transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+                temp.innerText = interim_transcript;
+            }
+        }
+    };
+    recognition.onerror = function () {
+        info.innerText = "error";
+        temp.innerText = '';
+        console.log(final_transcript);
+        console.log('======================' + "error" + '======================');
+    };
+    recognition.onend = function () {
+        info.innerText = "识别结束";
+        temp.innerText = '';
+        console.log(final_transcript);
+        console.log('======================' + "end" + '======================');
+    };
+
+    recognition.lang = "en-US";
+
+    document.onkeydown = function (ev) {
+        if (ev.key === '0') {
+            recognition.start();
+            return false;
+        }
+    };
+
+
+</script>
+</html>
